@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-fast-csv",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Node-Red node using fast-csv parser/formatter",
   "main": "node/fastcsv.js",
   "scripts": {

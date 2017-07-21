@@ -6,20 +6,14 @@
 
 <script type="text/x-red" data-template-name="fastcsv">
     <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="fastcsv">
+    </div>
+    <div class="form-row">
         <ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-fastcsv-tabs"></ul>
     </div>
     <div id="node-fastcsv-tabs-content">
         <div id="node-fastcsv-tabs-headers" style="display:none">
-            <div class="form-row">
-                <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-                <input type="text" id="node-input-name" placeholder="fastcsv">
-            </div>
-            <div class="form-row">
-            When <code>msg.payload</code> is a JavaScript Object, <i>fastcsv</i>
-            will <strong>format</strong> it into a CSV string.<br>
-            When <code>msg.payload</code> is a string, <i>fastcsv</i> will <strong>parse</strong> it into a 
-            JavaScript Object.
-            </div>
             <div class="form-row">
                 <input id="node-input-headers" type="checkbox" checked style="display: inline-block; width: auto; vertical-align: top;">
                 <label for="node-input-headers" style="width: auto"> Add (format) or expect (parse) the first line as the header</label>
@@ -29,12 +23,14 @@
                 <label for="node-input-discardUnmappedColumns" style="width: auto"> Discard columns that do not map to a header</label>
             </div>
             <div class="form-row">
-                <input id="node-input-ignoreEmpty" type="checkbox" checked style="display: inline-block; width: auto; vertical-align: top;">
-                <label for="node-input-ignoreEmpty" style="width: auto"> Ignore empty rows</label>
-            </div>
-            <div class="form-row">
-                <input id="node-input-strictColumnHandling" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
-                <label for="node-input-strictColumnHandling" style="width: auto"> Consider empty objects/lines with too few fields as errors</label>
+                <hr>
+                Alternately you can specify a comma separated list of column names<br>
+                <label for="node-input-headerstr" style="width: auto"><i class="fa fa-tag"></i> Header</label>
+                <input type="text" id="node-input-headerstr" value="," placeholder="Comma delimited list of column names">
+                <br>(must match the order of each column in the CSV, otherwise the data columns will not match)
+                <br> ex: <code>firstName, lastName, address</code>.
+                Skip a column <code>firstName, , address</code>.
+                <hr>
             </div>
         </div>
         <div id="node-fastcsv-tabs-delimiters" style="display:none">
@@ -56,15 +52,21 @@
                 ie: 'First,"Name"' =&gt; '"First,""name"""'
             </div>
         </div>
-        <div id="node-fastcsv-tabs-parser" style="display:none">
+        <div id="node-fastcsv-tabs-empty" style="display:none">
             <div class="form-row">
-                <label for="node-input-comment" style="width: auto"><i class="fa fa-tag"></i> Comments</label>
-                <input type="text" id="node-input-comment" value="#" placeholder="#" style="width: 40px">
-                 Ignore lines that begin with the specified character (e.g. #)
+                <input id="node-input-ignoreEmpty" type="checkbox" checked style="display: inline-block; width: auto; vertical-align: top;">
+                <label for="node-input-ignoreEmpty" style="width: auto"> Ignore empty rows</label>
             </div>
             <div class="form-row">
-                <input id="node-input-trim" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
-                <label for="node-input-trim" style="width: auto"> Trim left and right whitespace from  all values parsed</label>
+                <input id="node-input-strictColumnHandling" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
+                <label for="node-input-strictColumnHandling" style="width: auto"> Consider empty objects/lines with too few fields as errors</label>
+            </div>
+        </div>
+        <div id="node-fastcsv-tabs-parser" style="display:none">
+            <div class="form-row">
+                 Ignore lines that begin with the specified character (e.g. #)<br>
+                <label for="node-input-comment" style="width: auto"><i class="fa fa-tag"></i> Comments</label>
+                <input type="text" id="node-input-comment" value="#" placeholder="#" style="width: 40px">
             </div>
             <div class="form-row">
                 <input id="node-input-ltrim" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
@@ -83,9 +85,11 @@
     node but with additional configuration settings which handle common CSV format variations.</p>
 
 <h3>Details</h3>
-    <p><code>msg.payload</code> is used as the content of the CSV parse/formatting.
-    If it contains a string it will be parsed to a JS Object before being sent to the next node.
-    If it contains a JS Object the payload will be formatted as a CSV string.</p>
+    <p>When <code>msg.payload</code> is a JavaScript Object, <i>fastcsv</i>
+    will <strong>format</strong> it into a CSV string.<br>
+    When <code>msg.payload</code> is a string, <i>fastcsv</i> will <strong>parse</strong>
+    it into a JavaScript Object.</p>
+    <p>Most of the options in the node configuration apply to both parsing and formatting.</p>
 
 <h3>Inputs</h3>
     <ol class="node-ports">
@@ -136,10 +140,11 @@
 <script type="text/javascript">/* global $ RED */
     RED.nodes.registerType('fastcsv',{
         category: 'function',      // the palette category
-        color: '#4dc4d8',
+        color: '#8BBDD9',
         defaults: {
             name: {value:'fastcsv'},
             headers: {value: true},
+            headerstr:  {value: ''},
             ignoreEmpty: {value: true},
             discardUnmappedColumns: {value: true},
             strictColumnHandling:  {value: false},
@@ -147,7 +152,6 @@
             quote: {value: '"'},
             escape: {value: '"'},
             comment: {value: '#'},
-            trim: {value: false},
             ltrim: {value: false},
             rtrim: {value: false},
         },
@@ -177,6 +181,10 @@
             tabs.addTab({
                 id: 'node-fastcsv-tabs-delimiters',
                 label: 'Delimiters'
+            });
+            tabs.addTab({
+                id: 'node-fastcsv-tabs-empty',
+                label: 'Empty'
             });
             tabs.addTab({
                 id: 'node-fastcsv-tabs-parser',

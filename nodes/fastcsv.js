@@ -18,6 +18,7 @@ module.exports = function(RED) {
 
         // Store local copies of the node configuration
         this.options = {
+            objectMode: true,
             headers: n.headers,
             ignoreEmpty: n.ignoreEmpty,
             discardUnmappedColumns: n.discardUnmappedColumns,
@@ -26,10 +27,13 @@ module.exports = function(RED) {
             quote: n.quote,
             escape: n.escape,
             comment: n.comment,
-            trim: n.trim,
+            trim: n.ltrim && n.rtrim ? true : false,
             ltrim: n.ltrim,
             rtrim: n.rtrim,
         };
+        if (n.headerstr) {
+            this.options.headers = n.headerstr.split(',');
+        }
 
         // copy "this" object
         var node = this;
