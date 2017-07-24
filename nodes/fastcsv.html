@@ -36,18 +36,18 @@
         <div id="node-fastcsv-tabs-delimiters" style="display:none">
             <div class="form-row">
                 <label for="node-input-delimiter" style="width: auto"><i class="fa fa-tag"></i></label>
-                <input type="text" id="node-input-delimiter" value="," placeholder="," style="width: 40px">
+                <input type="text" id="node-input-delimiter" value="," style="width: 40px">
                 Use an alternate delimiter such as ; or \t<br>All delimiters must be a single character
             </div>
             <div class="form-row">
                 <label for="node-input-quote" style="width: auto"><i class="fa fa-tag"></i></label>
-                <input type="text" id="node-input-quote" value='"' placeholder="&quot;" style="width: 40px">
+                <input type="text" id="node-input-quote" value='"' style="width: 40px">
                 Character to use to escape values that contain a delimiter<br>
-                If <i>blank</i> then all quoting will be ignored
+                <!-- If <i>blank</i> then all quoting will be ignored -->
             </div>
             <div class="form-row">
                 <label for="node-input-escape" style="width: auto"><i class="fa fa-tag"></i></label>
-                <input type="text" id="node-input-escape" value='"' placeholder="&quot;" style="width: 40px">
+                <input type="text" id="node-input-escape" value='"' style="width: 40px">
                 Character when escaping a value that is quoted and contains a quote character<br>
                 ie: 'First,"Name"' =&gt; '"First,""name"""'
             </div>
@@ -59,7 +59,7 @@
             </div>
             <div class="form-row">
                 <input id="node-input-strictColumnHandling" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
-                <label for="node-input-strictColumnHandling" style="width: auto"> Consider empty objects/lines with too few fields as errors</label>
+                <label for="node-input-strictColumnHandling" style="width: auto"> Consider empty rows/objects with too few fields as errors</label>
             </div>
         </div>
         <div id="node-fastcsv-tabs-parser" style="display:none">
@@ -70,11 +70,30 @@
             </div>
             <div class="form-row">
                 <input id="node-input-ltrim" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
-                <label for="node-input-ltrim" style="width: auto"> Trim left whitespace from  all values parsed</label>
+                <label for="node-input-ltrim" style="width: auto"> Trim left whitespace from all values parsed</label>
             </div>
             <div class="form-row">
                 <input id="node-input-rtrim" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
                 <label for="node-input-rtrim" style="width: auto"> Trim right whitespace from  all values parsed</label>
+            </div>
+        </div>
+        <div id="node-fastcsv-tabs-formatter" style="display:none">
+            <div class="form-row">
+                 Specify an alternate row delimiter (i.e \r\n)<br>
+                <label for="node-input-rowDelimiter" style="width: auto"><i class="fa fa-tag"></i> Row Delimiter</label>
+                <input type="text" id="node-input-rowDelimiter" value="&#92;n" placeholder="&#92;n" style="width: 40px">
+            </div>
+            <div class="form-row">
+                <input id="node-input-includeEndRowDelimiter" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
+                <label for="node-input-includeEndRowDelimiter" style="width: auto"> Include a row delimiter at the end of the csv</label>
+            </div>
+            <div class="form-row">
+                <input id="node-input-quoteHeaders" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
+                <label for="node-input-quoteHeaders" style="width: auto"> All headers will be quoted</label>
+            </div>
+            <div class="form-row">
+                <input id="node-input-quoteColumns" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;">
+                <label for="node-input-quoteColumns" style="width: auto">  Columns and headers will be quoted</label>
             </div>
         </div>
     </div>
@@ -154,16 +173,20 @@
             comment: {value: '#'},
             ltrim: {value: false},
             rtrim: {value: false},
+            rowDelimiter: {value: '\\n'},
+            includeEndRowDelimiter: {value: false},
+            quoteHeaders: {value: false},
+            quoteColumns: {value: false},
         },
         inputs:1,               // set the number of inputs - only 0 or 1
         outputs:1,              // set the number of outputs - 0 to n
         // set the icon (held in icons dir below where you save the node)
         icon: 'fastcsv.png',     // saved in  icons/myicon.png
         label: function() {     // sets the default label contents
-            return this.name||'fastcsv';
+            return this.name || 'fastcsv';
         },
         labelStyle: function() { // sets the class to apply to the label
-            return this.name?'node_label_italic':'';
+            return this.name ? 'node_label_italic' : '';
         },
         
         oneditprepare: function() {
@@ -188,7 +211,11 @@
             });
             tabs.addTab({
                 id: 'node-fastcsv-tabs-parser',
-                label: 'Parser'
+                label: 'Parse'
+            });
+            tabs.addTab({
+                id: 'node-fastcsv-tabs-formatter',
+                label: 'Format'
             });
             setTimeout(function() { tabs.resize(); },0);
         }
