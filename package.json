@@ -1,31 +1,38 @@
 {
-  "name": "node-red-contrib-fast-csv",
-  "version": "0.4.0",
-  "description": "Node-Red node using fast-csv parser/formatter",
-  "main": "node/fastcsv.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PotOfCoffee2Go/node-red-contrib-fast-csv.git"
-  },
-  "keywords": [
-    "node-red",
-    "fast-csv"
-  ],
-  "author": "Kim McKinley",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/PotOfCoffee2Go/node-red-contrib-fast-csv/issues"
-  },
-  "homepage": "https://github.com/PotOfCoffee2Go/node-red-contrib-fast-csv#readme",
-  "dependencies": {
-    "fast-csv": "^2.4.0"
-  },
-  "node-red": {
-    "nodes": {
-      "fastcsv": "nodes/fastcsv.js"
+    "name": "@mtucker119/node-red-contrib-fast-csv",
+    "version": "0.4.3",
+    "description": "Fork of node-red-contrib-fast-csv using fast-csv@5.x",
+    "main": "node/fastcsv.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mtucker119/node-red-contrib-fast-csv.git"
+    },
+    "keywords": [
+        "node-red",
+        "fast-csv",
+        "csv",
+        "parser",
+        "formatter"
+    ],
+    "author": "Matt Tucker (https://github.com/mtucker119)",
+    "contributors": {
+        "originalAuthor": "Kim McKinley (https://github.com/PotOfCoffee2Go)"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/mtucker119/node-red-contrib-fast-csv/issues"
+    },
+    "homepage": "https://github.com/mtucker119/node-red-contrib-fast-csv#readme",
+    "dependencies": {
+        "@fast-csv/format": "^5.0.2",
+        "@fast-csv/parse": "^5.0.2"
+    },
+    "node-red": {
+        "nodes": {
+            "fastcsv": "node/fastcsv.js"
+        }
     }
-  }
 }
