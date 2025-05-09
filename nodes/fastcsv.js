@@ -9,7 +9,10 @@
 module.exports = function(RED) {
     "use strict";
     // Require any external libraries
-    var csv = require("fast-csv");
+    // var csv = require("fast-csv");
+    // Using new API
+    const { parseString } = require('@fast-csv/parse');
+    const { writeToString } = require('@fast-csv/format');
 
     function replaceLiteralEscapes(str) {
         return str
@@ -52,6 +55,7 @@ module.exports = function(RED) {
 
         function parseCsv(msg) {
             var parsedObj = [];
+            /* 
             csv
                 .fromString(msg.payload, node.options)
                 .on("data", function(data){
@@ -64,11 +68,28 @@ module.exports = function(RED) {
                     else
                         node.status({fill: "red", shape: "ring", text: " No lines parsed!"});
                     node.send(msg);
-                }); 
+                });
+            */
+	    parseString(msg.payload, node.options)
+                .on("data", function(data) {
+                    parsedObj.push(data);
+                 })
+                .on("end", function() {
+                    msg.payload = parsedObj;
+                    if (parsedObj.length)
+                        node.status({ fill: "green", shape: "dot", text: ' Parsed: ' + parsedObj.length + ' lines' });
+                    else
+                        node.status({ fill: "red", shape: "ring", text: " No lines parsed!" });
+                    node.send(msg);
+                })
+               .on("error", function(error) {
+                   node.error("CSV parse error", error);
+               }); 
         }
         
         function formatCsv(msg) {
-            csv.writeToString(
+            /*
+	    csv.writeToString(
                 msg.payload,
                 node.options,
                 function(err, data) {
@@ -90,6 +111,24 @@ module.exports = function(RED) {
                     node.send(msg);
                 }
             );
+	    */
+            writeToString(msg.payload, node.options)
+                .then((data) => {
+                    const re = new RegExp(node.rowDelimiterStr, "g");
+                    const lines = (data.match(re) || []).length;
+                    if (lines) {
+                        node.status({ fill: "green", shape: "dot", text: ' Formatted: ' + lines + ' lines' });
+                        msg.payload = data;
+                    } else {
+                        node.status({ fill: "red", shape: "ring", text: " No lines formatted!" });
+                        msg.payload = node.options.rowDelimiter;
+                    }
+                    node.send(msg);
+                })
+                .catch((err) => {
+                    node.error(err.message);
+                    node.send(msg);
+                });
         }
         
         // Respond to inputs...
